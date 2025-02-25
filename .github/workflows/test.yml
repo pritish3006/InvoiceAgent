@@ -1,0 +1,40 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.12]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install -r requirements.txt
+        uv pip install pytest pytest-cov
+    
+    - name: Test with pytest
+      run: |
+        pytest --cov=invoiceagent tests/
+    
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v3
+      with:
+        fail_ci_if_error: false 
