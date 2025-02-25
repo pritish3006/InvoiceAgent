@@ -4,10 +4,12 @@ Command-line interface for InvoiceAgent.
 
 import click
 
+from invoiceagent.cli.db_commands import db_commands
+
 
 @click.group()
 def cli():
-    """InvoiceAgent: AI-powered invoicing for independent contractors."""
+    """InvoiceAgent: AI-powered invoicing for independent contractor work."""
     pass
 
 
@@ -20,6 +22,10 @@ def version():
         click.echo(f"InvoiceAgent v{version}")
     except:  # noqa: E722
         click.echo("InvoiceAgent development version")
+
+
+# Add subcommands
+cli.add_command(db_commands)
 
 
 def main():
