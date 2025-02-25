@@ -9,12 +9,12 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="invoiceagent",
     version="0.1.0",
-    author="Your Name",
+    author="Pritish Mishra",
     author_email="your.email@example.com",
     description="A lightweight, AI-powered invoicing system for independent contractors",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/invoiceagent",
+    url="https://github.com/pritish3006/InvoiceAgent",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
