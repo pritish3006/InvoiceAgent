@@ -1,8 +1,10 @@
 """Invoice repository for database operations."""
 
 from datetime import date
+from decimal import Decimal
 from typing import List, Optional
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
 from invoiceagent.db.models import Invoice, InvoiceStatus
@@ -127,5 +129,113 @@ class InvoiceRepository(BaseRepository[Invoice]):
             .join(Invoice.client)
             .filter(extract("year", Invoice.issue_date) == year)
             .group_by(Invoice.client_id)
+            .all()
+        )
+
+    def create(
+        self,
+        session: Session,
+        client_id: int,
+        invoice_number: str,
+        issue_date: date,
+        due_date: date,
+        status: InvoiceStatus = InvoiceStatus.DRAFT,
+        notes: Optional[str] = None,
+        subtotal: Optional[Decimal] = None,
+        tax_rate: Optional[Decimal] = None,
+        tax_amount: Optional[Decimal] = None,
+        total_amount: Optional[Decimal] = None,
+    ) -> Invoice:
+        """Create a new invoice.
+
+        Args:
+            session: The database session
+            client_id: The client ID
+            invoice_number: The invoice number
+            issue_date: The issue date
+            due_date: The due date
+            status: The initial status (default: DRAFT)
+            notes: Optional notes
+            subtotal: The subtotal amount
+            tax_rate: The tax rate percentage
+            tax_amount: The tax amount
+            total_amount: The total invoice amount
+
+        Returns:
+            The created invoice
+        """
+        invoice = Invoice(
+            client_id=client_id,
+            invoice_number=invoice_number,
+            issue_date=issue_date,
+            due_date=due_date,
+            status=status,
+            notes=notes,
+            subtotal=subtotal,
+            tax_rate=tax_rate,
+            tax_amount=tax_amount,
+            total_amount=total_amount,
+        )
+        session.add(invoice)
+        session.flush()  # Flush to get the ID
+        return invoice
+
+    def update_status(
+        self, session: Session, invoice_id: int, status: InvoiceStatus
+    ) -> Optional[Invoice]:
+        """Update the status of an invoice.
+
+        Args:
+            session: The database session
+            invoice_id: The invoice ID
+            status: The new status
+
+        Returns:
+            The updated invoice or None if not found
+        """
+        invoice = self.get_by_id(session, invoice_id)
+        if invoice:
+            invoice.status = status
+            session.flush()
+        return invoice
+
+    def mark_as_paid(
+        self, session: Session, invoice_id: int, payment_date: Optional[date] = None
+    ) -> Optional[Invoice]:
+        """Mark an invoice as paid.
+
+        Args:
+            session: The database session
+            invoice_id: The invoice ID
+            payment_date: The payment date (default: today)
+
+        Returns:
+            The updated invoice or None if not found
+        """
+        invoice = self.get_by_id(session, invoice_id)
+        if invoice:
+            invoice.status = InvoiceStatus.PAID
+            invoice.payment_date = payment_date or date.today()
+            session.flush()
+        return invoice
+
+    def get_unpaid(self, session: Session) -> List[Invoice]:
+        """Get all unpaid invoices (draft or sent).
+
+        Args:
+            session: The database session
+
+        Returns:
+            List of unpaid invoices
+        """
+        return (
+            session.query(Invoice)
+            .filter(
+                or_(
+                    Invoice.status == InvoiceStatus.DRAFT,
+                    Invoice.status == InvoiceStatus.SENT,
+                )
+            )
+            .order_by(Invoice.due_date)
             .all()
         )
