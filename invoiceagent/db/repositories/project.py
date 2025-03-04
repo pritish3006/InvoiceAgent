@@ -1,4 +1,5 @@
 """Project repository for database operations."""
+
 from typing import List, Optional
 
 from sqlalchemy.orm import Session, joinedload
@@ -48,9 +49,12 @@ class ProjectRepository(BaseRepository[Project]):
         Returns:
             The project with client loaded, or None if not found
         """
-        return session.query(Project).options(
-            joinedload(Project.client)
-        ).filter(Project.id == project_id).first()
+        return (
+            session.query(Project)
+            .options(joinedload(Project.client))
+            .filter(Project.id == project_id)
+            .first()
+        )
 
     def get_active_projects(self, session: Session) -> List[Project]:
         """Get all active projects.
@@ -61,4 +65,4 @@ class ProjectRepository(BaseRepository[Project]):
         Returns:
             List of active projects
         """
-        return session.query(Project).filter(Project.active == True).all() 
+        return session.query(Project).filter(Project.active == True).all()

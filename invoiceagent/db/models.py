@@ -8,21 +8,8 @@ import enum
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import (
-    JSON,
-    Boolean,
-    Column,
-    Date,
-    DateTime,
-    Enum,
-    Float,
-    ForeignKey,
-    Integer,
-    Numeric,
-    String,
-    Table,
-    Text,
-)
+from sqlalchemy import (JSON, Boolean, Column, Date, DateTime, Enum, Float,
+                        ForeignKey, Integer, Numeric, String, Table, Text)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 

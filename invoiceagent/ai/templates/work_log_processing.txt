@@ -1,0 +1,42 @@
+- Goal: Convert free-form work descriptions into structured work log entries.
+- Return Format: A structured JSON object matching the exact schema of our WorkLog model:
+{
+  "client": "string",
+  "project": "string",
+  "work_date": "YYYY-MM-DD",
+  "hours": float,
+  "description": "string",
+  "category": "string | null",
+  "billable": boolean,
+  "tags": ["string"]
+}
+- Warnings: Make reasonable inferences when information is missing. Don't invent details not implied. Ensure date format is YYYY-MM-DD.
+
+Work log text to process: {work_log}
+
+Information to extract:
+1. client: The company or individual the work was done for (string)
+2. project: The specific project or contract (string)
+3. work_date: When the work was performed (string in YYYY-MM-DD format)
+4. hours: Time spent on the work (floating point number, e.g., 3.5)
+5. description: A clear explanation of the work performed (string)
+6. category: Type of work e.g., Development, Design, Meeting, Research (string or null)
+7. billable: Whether the work should be billed (boolean, default to true)
+8. tags: Array of relevant keywords to help with filtering (array of strings, can be empty)
+
+Guidelines for accurate work log processing:
+
+FOR EXPLICIT INFORMATION:
+- Use exactly what's provided when information is clearly stated
+- Preserve client and project names exactly as written
+- Use explicit dates and hours when provided
+
+FOR IMPLICIT OR MISSING INFORMATION:
+- If date is not specified, use the date of the work log entry.
+- If hours are not specified, make a reasonable estimate based on the described work
+- For client and project, try to match terminology with existing records
+- If billable status is not mentioned, default to billable=true
+- Derive appropriate categories from the nature of the work described
+- If no tags are identified, return an empty array []
+
+Remember that the structured output will be stored in a database and used for invoice generation, so accuracy and consistency are critical. 

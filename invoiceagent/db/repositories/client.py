@@ -1,4 +1,5 @@
 """Client repository for database operations."""
+
 from typing import List, Optional
 
 from sqlalchemy.orm import Session, joinedload
@@ -35,9 +36,7 @@ class ClientRepository(BaseRepository[Client]):
         Returns:
             List of clients with their projects loaded
         """
-        return session.query(Client).options(
-            joinedload(Client.projects)
-        ).all()
+        return session.query(Client).options(joinedload(Client.projects)).all()
 
     def search_by_name(self, session: Session, name_pattern: str) -> List[Client]:
         """Search for clients with names matching a pattern.
@@ -49,6 +48,4 @@ class ClientRepository(BaseRepository[Client]):
         Returns:
             List of matching clients
         """
-        return session.query(Client).filter(
-            Client.name.like(f'%{name_pattern}%')
-        ).all() 
+        return session.query(Client).filter(Client.name.like(f"%{name_pattern}%")).all()

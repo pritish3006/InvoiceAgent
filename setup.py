@@ -30,4 +30,4 @@ setup(
             "invoiceagent=invoiceagent.cli:main",
         ],
     },
-) 
+)

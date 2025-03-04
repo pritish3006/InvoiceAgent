@@ -4,6 +4,7 @@ Base Repository module with common CRUD operations.
 This module provides a BaseRepository class with common database operations
 that can be extended by specific model repositories.
 """
+
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
 
 from sqlalchemy.orm import Session
@@ -11,7 +12,7 @@ from sqlalchemy.orm import Session
 from invoiceagent.db.models import Base
 
 # Define a generic type variable for SQLAlchemy models
-T = TypeVar('T', bound=Base)
+T = TypeVar("T", bound=Base)
 
 
 class BaseRepository(Generic[T]):
@@ -96,4 +97,4 @@ class BaseRepository(Generic[T]):
             session.delete(entity)
             session.flush()
             return True
-        return False 
+        return False

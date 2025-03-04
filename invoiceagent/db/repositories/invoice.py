@@ -1,4 +1,5 @@
 """Invoice repository for database operations."""
+
 from datetime import date
 from typing import List, Optional
 
@@ -51,7 +52,9 @@ class InvoiceRepository(BaseRepository[Invoice]):
         """
         return session.query(Invoice).filter(Invoice.client_id == client_id).all()
 
-    def get_by_date_range(self, session: Session, start_date: date, end_date: date) -> List[Invoice]:
+    def get_by_date_range(
+        self, session: Session, start_date: date, end_date: date
+    ) -> List[Invoice]:
         """Get invoices within a specific issue date range.
 
         Args:
@@ -62,10 +65,12 @@ class InvoiceRepository(BaseRepository[Invoice]):
         Returns:
             List of invoices in the date range
         """
-        return session.query(Invoice).filter(
-            Invoice.issue_date >= start_date,
-            Invoice.issue_date <= end_date
-        ).order_by(Invoice.issue_date).all()
+        return (
+            session.query(Invoice)
+            .filter(Invoice.issue_date >= start_date, Invoice.issue_date <= end_date)
+            .order_by(Invoice.issue_date)
+            .all()
+        )
 
     def get_with_items(self, session: Session, invoice_id: int) -> Optional[Invoice]:
         """Get an invoice by ID and eagerly load its items.
@@ -77,9 +82,12 @@ class InvoiceRepository(BaseRepository[Invoice]):
         Returns:
             The invoice with items loaded, or None if not found
         """
-        return session.query(Invoice).options(
-            joinedload(Invoice.items)
-        ).filter(Invoice.id == invoice_id).first()
+        return (
+            session.query(Invoice)
+            .options(joinedload(Invoice.items))
+            .filter(Invoice.id == invoice_id)
+            .first()
+        )
 
     def get_with_client_and_items(self, session: Session, invoice_id: int) -> Optional[Invoice]:
         """Get an invoice by ID and eagerly load its client and items.
@@ -91,10 +99,12 @@ class InvoiceRepository(BaseRepository[Invoice]):
         Returns:
             The invoice with client and items loaded, or None if not found
         """
-        return session.query(Invoice).options(
-            joinedload(Invoice.client),
-            joinedload(Invoice.items)
-        ).filter(Invoice.id == invoice_id).first()
+        return (
+            session.query(Invoice)
+            .options(joinedload(Invoice.client), joinedload(Invoice.items))
+            .filter(Invoice.id == invoice_id)
+            .first()
+        )
 
     def get_total_by_client(self, session: Session, year: int) -> List[tuple]:
         """Get total invoice amounts by client for a specific year.
@@ -106,16 +116,16 @@ class InvoiceRepository(BaseRepository[Invoice]):
         Returns:
             List of tuples with (client_id, client_name, total_amount)
         """
-        from sqlalchemy import func, extract
-        
-        return session.query(
-            Invoice.client_id,
-            Invoice.client.name,
-            func.sum(Invoice.total_amount).label('total_amount')
-        ).join(
-            Invoice.client
-        ).filter(
-            extract('year', Invoice.issue_date) == year
-        ).group_by(
-            Invoice.client_id
-        ).all() 
+        from sqlalchemy import extract, func
+
+        return (
+            session.query(
+                Invoice.client_id,
+                Invoice.client.name,
+                func.sum(Invoice.total_amount).label("total_amount"),
+            )
+            .join(Invoice.client)
+            .filter(extract("year", Invoice.issue_date) == year)
+            .group_by(Invoice.client_id)
+            .all()
+        )

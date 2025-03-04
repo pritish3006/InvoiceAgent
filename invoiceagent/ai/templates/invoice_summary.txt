@@ -1,0 +1,18 @@
+- Goal: Create a concise, professional summary for an invoice that highlights value delivered.
+- Return Format: A brief paragraph (2-4 sentences) suitable for the top of an invoice.
+- Warnings: Avoid technical jargon unless appropriate. Don't include financial details. Keep concise and professional.
+
+Invoice details:
+{invoice_details}
+
+Guidelines for creating an effective invoice summary:
+
+1. Provide context for the billing period and work performed
+2. Highlight key accomplishments, deliverables, or milestones achieved
+3. Connect the work to the client's business objectives when possible
+4. Maintain a professional, concise tone appropriate for formal business communication
+5. Focus on value delivered rather than listing individual tasks
+6. Use terminology that resonates with the client's industry and priorities
+7. Set the appropriate context for the detailed line items that follow
+
+Remember that this summary will appear at the top of the invoice and is often the first thing a client reads, so it should effectively frame the value of your services while maintaining complete professionalism.

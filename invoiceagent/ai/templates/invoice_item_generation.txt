@@ -1,0 +1,29 @@
+- Goal: Transform work information into professional, client-ready invoice line items.
+- Input Types: You may receive either structured work logs OR free-form descriptions of work completed.
+- Return Format: An array of invoice line items with descriptions, hours, rates, and amounts.
+- Warnings: Maintain exact hour totals. Ensure calculations are correct. Avoid technical jargon. Don't duplicate work or create fictional items.
+
+Work information to process:
+{work_logs}
+
+Guidelines for generating quality invoice items:
+
+FOR STRUCTURED WORK LOGS:
+1. Group similar activities into cohesive line items, even if performed on different days
+2. Create clear, concise descriptions that communicate value to the client
+3. Use the exact hours provided in the logs for accurate billing
+
+FOR FREE-FORM DESCRIPTIONS:
+1. Extract key information about tasks, hours, and dates (if mentioned)
+2. Make reasonable inferences about time spent if hours aren't explicitly stated
+3. Structure the information into professional invoice items
+4. Note any significant uncertainties that might need client verification
+
+GENERAL GUIDELINES:
+1. Ensure descriptions are professional and appropriate for billing purposes
+2. Preserve categories when they exist for consistency
+3. Focus on deliverables and outcomes rather than technical details
+4. Use industry-standard terminology that clients will understand
+5. Maintain complete accuracy in hour calculations when hours are provided
+
+Remember that these line items will appear directly on an invoice sent to the client, so they should be clear, professional, and justify the value of work performed.
