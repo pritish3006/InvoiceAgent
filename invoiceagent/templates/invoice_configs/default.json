@@ -1,0 +1,240 @@
+{
+  "name": "Default",
+  "description": "Default invoice template with a clean, professional design",
+  "page_size": "A4",
+  "page_orientation": "portrait",
+  "margin_top": 50.0,
+  "margin_right": 50.0,
+  "margin_bottom": 50.0,
+  "margin_left": 50.0,
+  "header": {
+    "height": 120.0,
+    "show_logo": true,
+    "logo_position": {
+      "x": 50,
+      "y": 50,
+      "width": 150,
+      "height": 50
+    },
+    "company_name": "Your Company",
+    "company_details": "123 Main Street\nCity, State 12345\nPhone: (123) 456-7890\nEmail: contact@example.com",
+    "style": {
+      "padding": {
+        "top": 10.0,
+        "right": 10.0,
+        "bottom": 10.0,
+        "left": 10.0
+      },
+      "text_style": {
+        "font": {
+          "family": "Helvetica",
+          "size": 12,
+          "bold": true,
+          "color": {
+            "r": 51,
+            "g": 51,
+            "b": 51
+          }
+        },
+        "alignment": "left"
+      }
+    }
+  },
+  "client": {
+    "title": "Bill To:",
+    "style": {
+      "padding": {
+        "top": 5.0,
+        "right": 10.0,
+        "bottom": 2.0,
+        "left": 10.0
+      },
+      "text_style": {
+        "font": {
+          "family": "Helvetica",
+          "size": 10,
+          "color": {
+            "r": 51,
+            "g": 51,
+            "b": 51
+          }
+        },
+        "alignment": "left"
+      }
+    }
+  },
+  "invoice_info": {
+    "title": "INVOICE",
+    "show_invoice_number": true,
+    "show_issue_date": true,
+    "show_due_date": true,
+    "style": {
+      "padding": {
+        "top": 10.0,
+        "right": 10.0,
+        "bottom": 10.0,
+        "left": 10.0
+      },
+      "text_style": {
+        "font": {
+          "family": "Helvetica",
+          "size": 10,
+          "color": {
+            "r": 51,
+            "g": 51,
+            "b": 51
+          }
+        },
+        "alignment": "left"
+      }
+    }
+  },
+  "items_table": {
+    "columns": [
+      {
+        "name": "description",
+        "title": "Description",
+        "width": 50,
+        "align": "left"
+      },
+      {
+        "name": "quantity",
+        "title": "Hours",
+        "width": 15,
+        "align": "right"
+      },
+      {
+        "name": "rate",
+        "title": "Rate",
+        "width": 15,
+        "align": "right"
+      },
+      {
+        "name": "amount",
+        "title": "Amount",
+        "width": 20,
+        "align": "right"
+      }
+    ],
+    "header_style": {
+      "background_color": {
+        "r": 240,
+        "g": 240,
+        "b": 240
+      },
+      "border": {
+        "width": 1.0,
+        "color": {
+          "r": 200,
+          "g": 200,
+          "b": 200
+        }
+      },
+      "padding": {
+        "top": 5.0,
+        "right": 5.0,
+        "bottom": 5.0,
+        "left": 5.0
+      },
+      "text_style": {
+        "font": {
+          "family": "Helvetica",
+          "size": 10,
+          "bold": true,
+          "color": {
+            "r": 51,
+            "g": 51,
+            "b": 51
+          }
+        },
+        "alignment": "left"
+      }
+    },
+    "row_style": {
+      "border": {
+        "width": 0.5,
+        "color": {
+          "r": 220,
+          "g": 220,
+          "b": 220
+        }
+      },
+      "padding": {
+        "top": 5.0,
+        "right": 5.0,
+        "bottom": 5.0,
+        "left": 5.0
+      },
+      "text_style": {
+        "font": {
+          "family": "Helvetica",
+          "size": 9,
+          "color": {
+            "r": 51,
+            "g": 51,
+            "b": 51
+          }
+        },
+        "alignment": "left"
+      }
+    },
+    "alternate_row_style": {
+      "background_color": {
+        "r": 250,
+        "g": 250,
+        "b": 250
+      }
+    },
+    "show_category": true
+  },
+  "totals": {
+    "show_subtotal": true,
+    "show_tax": true,
+    "show_total": true,
+    "style": {
+      "padding": {
+        "top": 10.0,
+        "right": 10.0,
+        "bottom": 10.0,
+        "left": 10.0
+      },
+      "text_style": {
+        "font": {
+          "family": "Helvetica",
+          "size": 10,
+          "color": {
+            "r": 51,
+            "g": 51,
+            "b": 51
+          }
+        },
+        "alignment": "right"
+      }
+    }
+  },
+  "footer": {
+    "height": 50.0,
+    "show_page_numbers": true,
+    "text": "Payment Details:\\nBank Name: Example Bank\\nAccount Number: XXXX-XXXX-XXXX-1234\\nRouting Number: XXXXXXXXX\\n\\nPlease include the invoice number in the payment reference.",
+    "style": {
+      "padding": {
+        "top": 10.0,
+        "right": 10.0,
+        "bottom": 10.0,
+        "left": 10.0
+      },
+      "text_style": {
+        "font": {
+          "family": "Helvetica",
+          "size": 9,
+          "color": {
+            "r": 102,
+            "g": 102,
+            "b": 102
+          }
+        },
+        "alignment": "center"
+      }
+    }
+  }
+}
