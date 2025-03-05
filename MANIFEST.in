@@ -1,0 +1,32 @@
+include LICENSE
+include README.md
+include CHANGELOG.md
+include pyproject.toml
+include setup.py
+include build_package.py
+
+# Include all template files
+recursive-include invoiceagent/templates *.html *.css *.js *.txt
+
+# Include all documentation
+recursive-include docs *.md *.rst *.txt
+
+# Exclude development and testing artifacts
+recursive-exclude tests *
+recursive-exclude .github *
+exclude .gitignore
+exclude .coverage
+exclude .pytest_cache
+exclude pytest.ini
+exclude *.pyc
+
+# Include requirements
+include requirements.txt
+
+# Include all export files
+recursive-include invoiceagent/export *
+
+# Include all AI template files
+recursive-include invoiceagent/ai/templates *
+
+global-exclude *.py[cod] __pycache__ *.so *.dylib 
