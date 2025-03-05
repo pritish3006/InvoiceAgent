@@ -4,18 +4,26 @@ import asyncio
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
-from typing import Optional, Dict, List, Any
+from typing import Any, Dict, List, Optional
 
 import click
 from rich.console import Console
 from rich.table import Table as RichTable
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
+from sqlalchemy.exc import IntegrityError
 
 from invoiceagent.cli.utils import (
-    confirm_action, format_currency, format_date, print_entity, print_error,
-    print_info, print_section_header, print_subsection_header, print_success,
-    print_table, print_warning
+    confirm_action,
+    format_currency,
+    format_date,
+    print_entity,
+    print_error,
+    print_info,
+    print_section_header,
+    print_subsection_header,
+    print_success,
+    print_table,
+    print_warning,
 )
 from invoiceagent.db.engine import get_session
 from invoiceagent.db.models import Invoice, InvoiceItem, InvoiceStatus
@@ -24,7 +32,10 @@ from invoiceagent.db.repositories.invoice import InvoiceRepository
 from invoiceagent.db.repositories.project import ProjectRepository
 from invoiceagent.db.repositories.work_log import WorkLogRepository
 from invoiceagent.export.pdf_generator import generate_invoice_pdf
-from invoiceagent.export.template_manager import get_template_details, list_available_templates
+from invoiceagent.export.template_manager import (
+    get_template_details,
+    list_available_templates,
+)
 
 # Create console for rich output
 console = Console()
@@ -40,7 +51,13 @@ def invoice_commands():
 @click.option("--client-id", required=True, type=int, help="Client ID for the invoice")
 @click.option("--start-date", required=True, type=str, help="Start date (YYYY-MM-DD)")
 @click.option("--end-date", required=True, type=str, help="End date (YYYY-MM-DD)")
-@click.option("--issue-date", required=False, type=str, default=lambda: datetime.now().strftime("%Y-%m-%d"), help="Issue date (YYYY-MM-DD)")
+@click.option(
+    "--issue-date",
+    required=False,
+    type=str,
+    default=lambda: datetime.now().strftime("%Y-%m-%d"),
+    help="Issue date (YYYY-MM-DD)",
+)
 @click.option("--due-date", required=False, type=str, help="Due date (YYYY-MM-DD)")
 @click.option("--tax-rate", required=False, type=float, default=0.0, help="Tax rate percentage")
 @click.option("--notes", required=False, type=str, help="Invoice notes")
@@ -48,13 +65,23 @@ def invoice_commands():
 @click.option("--include-equity", is_flag=True, help="Include equity components")
 @click.option("--dry-run", is_flag=True, help="Preview invoice without saving")
 def generate_invoice(
-    client_id, start_date, end_date, issue_date, due_date, tax_rate, notes, combine_items, include_equity, dry_run
+    client_id,
+    start_date,
+    end_date,
+    issue_date,
+    due_date,
+    tax_rate,
+    notes,
+    combine_items,
+    include_equity,
+    dry_run,
 ):
     """Generate an invoice from work logs."""
     import logging
+
     logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger("invoiceagent.cli.invoice_commands")
-    
+
     try:
         logger.debug("Starting invoice generation process")
         # Convert string dates to date objects
@@ -62,19 +89,25 @@ def generate_invoice(
             start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
             end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
             issue_date_obj = datetime.strptime(issue_date, "%Y-%m-%d").date()
-            due_date_obj = datetime.strptime(due_date, "%Y-%m-%d").date() if due_date else (issue_date_obj + timedelta(days=30))
-            logger.debug(f"Parsed dates: start={start_date_obj}, end={end_date_obj}, issue={issue_date_obj}, due={due_date_obj}")
+            due_date_obj = (
+                datetime.strptime(due_date, "%Y-%m-%d").date()
+                if due_date
+                else (issue_date_obj + timedelta(days=30))
+            )
+            logger.debug(
+                f"Parsed dates: start={start_date_obj}, end={end_date_obj}, issue={issue_date_obj}, due={due_date_obj}"
+            )
         except ValueError as e:
             print_error(f"Invalid date format: {e}. Use YYYY-MM-DD format.")
             return
-        
+
         if start_date_obj > end_date_obj:
             print_error("Start date must be before end date.")
             return
-        
+
         if issue_date_obj > due_date_obj:
             print_warning("Issue date is after due date.")
-        
+
         # Convert tax rate from percentage to decimal
         try:
             tax_rate_decimal = Decimal(str(tax_rate / 100))
@@ -82,27 +115,29 @@ def generate_invoice(
         except (ValueError, ArithmeticError, TypeError) as e:
             print_error(f"Invalid tax rate: {tax_rate}. Error: {e}")
             return
-        
+
         with get_session() as session:
             # Verify client exists
             client_repo = ClientRepository()
             client = client_repo.get_by_id(session, client_id)
             logger.debug(f"Client lookup result: {client}")
-            
+
             if not client:
                 print_error(f"Client with ID {client_id} not found.")
                 return
-            
-            print_info(f"Generating invoice for '{client.name}' from {start_date_obj} to {end_date_obj}")
-            
+
+            print_info(
+                f"Generating invoice for '{client.name}' from {start_date_obj} to {end_date_obj}"
+            )
+
             # Generate invoice
             invoice_repo = InvoiceRepository()
-            
+
             try:
                 # Create a default category mapping
                 category_map = {}
                 logger.debug("Calling create_invoice_from_work_logs")
-                
+
                 invoice = invoice_repo.create_invoice_from_work_logs(
                     session=session,
                     client_id=client_id,
@@ -116,15 +151,19 @@ def generate_invoice(
                     combine_same_category=combine_items,
                     include_equity=include_equity,
                 )
-                
+
                 logger.debug(f"Invoice created: {invoice}")
-                logger.debug(f"Invoice items type: {type(invoice.items) if hasattr(invoice, 'items') else 'No items attribute'}")
-                logger.debug(f"Invoice items count: {len(invoice.items) if hasattr(invoice, 'items') and invoice.items is not None else 0}")
-                
+                logger.debug(
+                    f"Invoice items type: {type(invoice.items) if hasattr(invoice, 'items') else 'No items attribute'}"
+                )
+                logger.debug(
+                    f"Invoice items count: {len(invoice.items) if hasattr(invoice, 'items') and invoice.items is not None else 0}"
+                )
+
                 if not invoice:
                     print_error("No billable work logs found in the specified date range.")
                     return
-                
+
                 if dry_run:
                     # Don't commit, just preview the invoice
                     logger.debug("Dry run mode - calling _display_invoice_details")
@@ -144,11 +183,13 @@ def generate_invoice(
                 logger.exception("Error in invoice generation:")
                 print_error(f"Error generating invoice: {str(e)}")
                 import traceback
+
                 logger.debug(f"Traceback: {traceback.format_exc()}")
     except Exception as e:
         logger.exception("Unhandled exception in generate_invoice:")
         print_error(f"An unexpected error occurred: {str(e)}")
         import traceback
+
         logger.debug(f"Traceback: {traceback.format_exc()}")
 
 
@@ -179,55 +220,72 @@ def list_invoices(
     # Convert date strings to date objects if provided
     start_date_obj = None
     end_date_obj = None
-    
+
     if start_date:
         try:
             start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
         except ValueError:
             print_error(f"Invalid start date format: {start_date}. Use YYYY-MM-DD.")
             return
-            
+
     if end_date:
         try:
             end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
         except ValueError:
             print_error(f"Invalid end date format: {end_date}. Use YYYY-MM-DD.")
             return
-    
+
     with get_session() as session:
         invoice_repo = InvoiceRepository()
         client_repo = ClientRepository()
         invoices = []
-        
+
         # Determine search method based on provided filters
         if client_id and status and start_date_obj and end_date_obj:
             # Filter by client, status, and date range
-            invoices = session.query(Invoice).filter(
-                Invoice.client_id == client_id,
-                Invoice.status == status,
-                Invoice.issue_date >= start_date_obj,
-                Invoice.issue_date <= end_date_obj
-            ).order_by(desc(Invoice.issue_date)).all()
+            invoices = (
+                session.query(Invoice)
+                .filter(
+                    Invoice.client_id == client_id,
+                    Invoice.status == status,
+                    Invoice.issue_date >= start_date_obj,
+                    Invoice.issue_date <= end_date_obj,
+                )
+                .order_by(desc(Invoice.issue_date))
+                .all()
+            )
         elif client_id and status:
             # Filter by client and status
-            invoices = session.query(Invoice).filter(
-                Invoice.client_id == client_id,
-                Invoice.status == status
-            ).order_by(desc(Invoice.issue_date)).all()
+            invoices = (
+                session.query(Invoice)
+                .filter(Invoice.client_id == client_id, Invoice.status == status)
+                .order_by(desc(Invoice.issue_date))
+                .all()
+            )
         elif client_id and start_date_obj and end_date_obj:
             # Filter by client and date range
-            invoices = session.query(Invoice).filter(
-                Invoice.client_id == client_id,
-                Invoice.issue_date >= start_date_obj,
-                Invoice.issue_date <= end_date_obj
-            ).order_by(desc(Invoice.issue_date)).all()
+            invoices = (
+                session.query(Invoice)
+                .filter(
+                    Invoice.client_id == client_id,
+                    Invoice.issue_date >= start_date_obj,
+                    Invoice.issue_date <= end_date_obj,
+                )
+                .order_by(desc(Invoice.issue_date))
+                .all()
+            )
         elif status and start_date_obj and end_date_obj:
             # Filter by status and date range
-            invoices = session.query(Invoice).filter(
-                Invoice.status == status,
-                Invoice.issue_date >= start_date_obj,
-                Invoice.issue_date <= end_date_obj
-            ).order_by(desc(Invoice.issue_date)).all()
+            invoices = (
+                session.query(Invoice)
+                .filter(
+                    Invoice.status == status,
+                    Invoice.issue_date >= start_date_obj,
+                    Invoice.issue_date <= end_date_obj,
+                )
+                .order_by(desc(Invoice.issue_date))
+                .all()
+            )
         elif client_id:
             # Filter by client only
             invoices = invoice_repo.get_by_client_id(session, client_id)
@@ -296,7 +354,7 @@ def get_invoice(invoice_id: int):
         client_repo = ClientRepository()
 
         # Get invoice with items
-        invoice = invoice_repo.get_with_items(session, invoice_id)
+        invoice = invoice_repo.get_with_client_and_items(session, invoice_id)
 
         if not invoice:
             print_error(f"Invoice with ID {invoice_id} not found.")
@@ -422,54 +480,51 @@ def delete_invoice(invoice_id: int, force: bool = False):
 @click.option("--template", default="default", help="Invoice template to use")
 @click.option("--list-templates", is_flag=True, help="List available templates and exit")
 def export_invoice(
-    invoice_id: int, 
-    output: Optional[str] = None, 
+    invoice_id: int,
+    output: Optional[str] = None,
     template: str = "default",
-    list_templates: bool = False
+    list_templates: bool = False,
 ):
     """Export an invoice to PDF."""
-    
+
     # List templates if requested
     if list_templates:
         templates = get_template_details()
         print_section_header("Available Invoice Templates")
-        
+
         for template_info in templates:
             console.print(f"[bold]{template_info['name']}[/bold]: {template_info['description']}")
-        
+
         return
-    
+
     # Get invoice
     with get_session() as session:
         invoice_repo = InvoiceRepository()
         work_log_repo = WorkLogRepository()
-        
+
         # Get invoice with client and items
         invoice = invoice_repo.get_with_client_and_items(session, invoice_id)
-        
+
         if not invoice:
             print_error(f"Invoice with ID {invoice_id} not found.")
             return
-        
+
         # Get work logs for this invoice
         work_logs = work_log_repo.get_by_invoice_id(session, invoice_id)
-        
+
         # Determine output path
         if not output:
             output = f"invoice_{invoice.invoice_number.replace(' ', '_')}.pdf"
-        
+
         try:
             # Generate PDF
             print_info(f"Generating PDF for invoice {invoice.invoice_number}...")
             pdf_path = generate_invoice_pdf(
-                invoice=invoice,
-                output_path=output,
-                template_name=template,
-                work_logs=work_logs
+                invoice=invoice, output_path=output, template_name=template, work_logs=work_logs
             )
-            
+
             print_success(f"Invoice exported to {pdf_path}")
-            
+
         except Exception as e:
             print_error(f"Error exporting invoice: {str(e)}")
 
@@ -479,7 +534,7 @@ def list_invoice_templates():
     """List available invoice templates."""
     templates = get_template_details()
     print_section_header("Available Invoice Templates")
-    
+
     for template_info in templates:
         console.print(f"[bold]{template_info['name']}[/bold]: {template_info['description']}")
 
@@ -487,7 +542,7 @@ def list_invoice_templates():
 def _display_invoice_details(invoice, show_items=True):
     """
     Display detailed information about an invoice.
-    
+
     Args:
         invoice: Invoice object to display
         show_items: Whether to show invoice items
@@ -501,33 +556,33 @@ def _display_invoice_details(invoice, show_items=True):
         "Due Date": format_date(invoice.due_date),
         "Subtotal": format_currency(invoice.subtotal),
     }
-    
+
     if invoice.tax_rate and float(invoice.tax_rate) > 0:
         invoice_data["Tax Rate"] = f"{float(invoice.tax_rate) * 100:.2f}%"
         invoice_data["Tax Amount"] = format_currency(invoice.tax_amount)
-    
+
     invoice_data["Total Amount"] = format_currency(invoice.total_amount)
-    
+
     if invoice.paid_date:
         invoice_data["Paid Date"] = format_date(invoice.paid_date)
-    
+
     if invoice.sent_date:
         invoice_data["Sent Date"] = format_date(invoice.sent_date)
-    
+
     if invoice.notes:
         invoice_data["Notes"] = invoice.notes
-    
+
     print_entity(invoice_data)
-    
+
     # Show items if requested
-    has_items = hasattr(invoice, 'items') and invoice.items is not None
+    has_items = hasattr(invoice, "items") and invoice.items is not None
     items_list = []
-    
+
     # Safely get items from invoice
     if has_items:
         try:
             # Handle both cases: when items is already a list and when it's an attribute with items
-            if hasattr(invoice.items, 'items') and callable(getattr(invoice.items, 'items')):
+            if hasattr(invoice.items, "items") and callable(getattr(invoice.items, "items")):
                 # This handles the case where invoice.items has a method called items() (like a dict)
                 items_list = list(invoice.items.items())
             else:
@@ -535,44 +590,42 @@ def _display_invoice_details(invoice, show_items=True):
                 items_list = list(invoice.items)
         except Exception as e:
             print_warning(f"Error processing invoice items: {str(e)}")
-    
+
     if show_items and items_list:
         print_subsection_header("Invoice Items")
-        
+
         # Prepare table data
         item_data = []
         for item in items_list:
-            item_data.append([
-                item.description,
-                f"{float(item.quantity):.2f}" if item.quantity else "",
-                item.unit or "-",
-                format_currency(item.rate) if item.rate else "-",
-                format_currency(item.amount),
-                item.category or "-"
-            ])
-        
+            item_data.append(
+                [
+                    item.description,
+                    f"{float(item.quantity):.2f}" if item.quantity else "",
+                    item.unit or "-",
+                    format_currency(item.rate) if item.rate else "-",
+                    format_currency(item.amount),
+                    item.category or "-",
+                ]
+            )
+
         # Print the table
-        print_table(
-            ["Description", "Quantity", "Unit", "Rate", "Amount", "Category"],
-            item_data
-        )
-        
+        print_table(["Description", "Quantity", "Unit", "Rate", "Amount", "Category"], item_data)
+
         # Display equity information if any items have it
-        has_equity = any(getattr(item, 'has_equity_component', False) for item in items_list)
+        has_equity = any(getattr(item, "has_equity_component", False) for item in items_list)
         if has_equity:
             print_subsection_header("Equity Components")
             equity_data = []
             for item in items_list:
-                if getattr(item, 'has_equity_component', False):
-                    equity_data.append([
-                        item.description,
-                        item.equity_type or "-",
-                        f"{float(item.equity_quantity):.4f}" if item.equity_quantity else "-",
-                        item.equity_description or "-"
-                    ])
-            
+                if getattr(item, "has_equity_component", False):
+                    equity_data.append(
+                        [
+                            item.description,
+                            item.equity_type or "-",
+                            f"{float(item.equity_quantity):.4f}" if item.equity_quantity else "-",
+                            item.equity_description or "-",
+                        ]
+                    )
+
             if equity_data:
-                print_table(
-                    ["Description", "Type", "Quantity", "Details"],
-                    equity_data
-                )
+                print_table(["Description", "Type", "Quantity", "Details"], equity_data)
