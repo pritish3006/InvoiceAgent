@@ -38,7 +38,7 @@ Important files:
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - [Ollama](https://ollama.ai/) installed locally
 - Llama 3.2 model pulled in Ollama
 

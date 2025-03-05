@@ -35,11 +35,28 @@ InvoiceAgent is a comprehensive tool designed to simplify the process of trackin
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - [Ollama](https://ollama.ai/) installed locally
 - Llama 3.2 model pulled in Ollama
 
-### Step-by-Step Installation
+### Production Installation (End Users)
+
+If you just want to use InvoiceAgent without developing it:
+
+```bash
+# Install directly from PyPI
+pip install invoiceagent
+
+# Initialize the database
+invoiceagent db init
+
+# Pull the Llama 3.2 model in Ollama (if not already done)
+ollama pull llama3.2:latest
+```
+
+### Development Installation
+
+If you want to contribute to InvoiceAgent or modify the code:
 
 1. **Clone the repository**
 ```bash
